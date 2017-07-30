@@ -1,3 +1,13 @@
+from common import getUrlAsSoup
+
+ARTICLE_URL = 'http://iss.ndl.go.jp/api/opensearch?dpgroupid=digitalcontents&from={year_from}-01&until={year_to}-12&title={magazine}&publisher={publisher}'
+        
+def getArticles(magazine, publisher, year_from, year_to):
+    articles = []
+
+    return articles
+
+"""
 # -*- coding: utf-8 -*-
 from urllib import request
 from persondataminer import getUrlDataAsString
@@ -146,3 +156,4 @@ for i in range(1991,2016):
     miner.getMagazineData("Sapio","小学館",i)
     miner.saveMagazineDataToDb()
 
+"""

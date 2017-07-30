@@ -1,3 +1,64 @@
+from common import getUrlAsJson, similar
+
+VIAF_URL = 'http://www.viaf.org/viaf/search?query=local.personalNames+all+"{name}"&maximumRecords=50&httpAccept=application/json&recordSchema=info:srw/schema/1/briefmarcxml-v1.1&sortKeys=holdingscount'
+
+# Search viaf.org for a Name and returns the best match (based on name similarity)
+# if more entries match with the same similarity, best match will be based on number of name entries (= number of mentions in national libraries)
+def getViafMatch(name):
+    viafs = []
+    results = getUrlAsJson(VIAF_URL.format(name=name))
+    records = results["searchRetrieveResponse"]["records"]
+
+    for record in records:
+        viaf_id = record["record"]["recordData"]["viafID"]
+        birth_date = record["record"]["recordData"]["birthDate"]
+        death_date = record["record"]["recordData"]["deathDate"]
+        headings = record["record"]["recordData"]["mainHeadings"]["mainHeadingEl"]
+        names = []
+        if isinstance(headings, list):
+            for heading in headings:
+                if isinstance(heading["datafield"]["subfield"], list):
+                    names.append(heading["datafield"]["subfield"][0]["#text"])
+                else:
+                    names.append(heading["datafield"]["subfield"]["#text"])
+        else:
+            if isinstance(headings["datafield"]["subfield"], list):
+                names.append(headings["datafield"]["subfield"][0]["#text"])
+            else:
+                names.append(headings["datafield"]["subfield"]["#text"])
+        names= list(set(names))
+        best_match = 0
+        for viaf_name in names:
+            match = similar(viaf_name.replace(" ","").replace(",","").lower(), name.replace(" ","").replace(",","").lower())
+            if match > best_match:
+                best_match = match
+
+        viafs.append({
+            "viaf_id": viaf_id,
+            "names": names,
+            "birth_date": birth_date,
+            "death_date": death_date,
+            "match_ratio": best_match
+        })
+
+
+    viafs.sort(key=lambda x:x["match_ratio"],reverse=True)
+    if len(viafs) == 1:
+        return viafs[0]
+    elif len(viafs) > 1:
+        best_match = viafs[0]
+        for viaf in viafs:
+            if viaf["match_ratio"]  < best_match["match_ratio"]:
+                break
+            if len(viaf["names"]) > len(best_match["names"]):
+                best_match = viaf
+        return best_match
+    else:
+        return None
+
+print(getViafMatch("蓮見重彦"))
+
+"""
 import xml.etree.ElementTree as etree
 import urllib, json
 from urllib import request
@@ -131,147 +192,4 @@ class PersonDataminer:
                 self.name_en = last_name+" "+str(first_name)
 
 
-    def getViafData(self):
-        print("checking viaf data")
-        data = getUrlDataAsString("http://viaf.org/viaf/"+self.viaf+"/rdf.xml")
-        if data is not None:
-            soup = BeautifulSoup(data, "lxml")
-            names = soup.find_all('schema:name')
-            for name in names:
-                if name is not None:
-                    if name.get("xml:lang") in ("en", "en-US", "de", "de-DE"):
-                        tmp = name.text
-                        if len(tmp) > 1:
-                            if tmp[1].islower():
-                                self.name_en = tmp
-                                break
-            for name in names:
-                if name is not None:
-                    if name.get("xml:lang") in ("jp-JP", "jp"):
-                        tmp = name.text
-                        self.name_jp = tmp.replace(" ","")
 
-            data = getUrlDataAsString("http://viaf.org/viaf/"+self.viaf + "/marc21.xml")
-            if data is not None:
-                soup = BeautifulSoup(data, "lxml")
-                subfields = soup.find_all("mx:subfield")
-                for sub in subfields:
-                    if sub.get("code") == "d":
-                        years = sub.text.replace(u"(", "").replace(u")", "")
-                        years = years.split("-")
-                        try:
-                            self.birth = int(years[0])
-                        except:
-                            pass
-
-                        if len(years) > 1:
-                            try:
-                                self.death = int(years[1])
-                            except:
-                                pass
-                        break
-
-
-    def checkRealName(self):
-        print("Checking if real name")
-        url = "http://id.ndl.go.jp/auth/ndlna/"+self.ndl+".json"
-        data = getUrlDataAsString(url)
-        try:
-            ndl = json.loads(data)
-        except:
-            print("Could not load NDL data")
-            ndl = []
-
-        if "realName" in ndl:
-            uri = ndl["realName"][0]["uri"]
-            label =  ndl["realName"][0]["label"]
-            realname = label.split(u",")[0]+label.split(u",")[1]
-            self.penname = self.name_jp
-            self.name_jp = realname.replace("","").encode("utf8")
-            print("Real name: "+realname+" "+uri)
-
-            data = getUrlDataAsString(uri + ".json")
-            try:
-                ndl = json.loads(data)
-                uri = ndl["exactMatch"][0]["uri"]
-                data = getUrlDataAsString(uri+"/justlinks.json")
-                links = json.loads(data)
-                self.viaf = uri
-                if "viafID" in links:
-                    self.viaf = "http://viaf.org/viaf/"+links["viafID"]
-                if "NDL" in links:
-                    self.ndl = links["NDL"][0]
-                if "WKP" in links:
-                    self.wkp = links["WKP"][0]
-                if "NII" in links:
-                    self.nii = links["NII"][0]
-            except:
-                pass
-        else:
-            print("Name is real")
-
-
-    def getWikidata(self):
-        wikidata = WikidataHelper().getJson(self.wkp)
-        if wikidata is not None:
-            labels = wikidata['entities'][self.wkp]['labels']
-            claims = wikidata['entities'][self.wkp]['claims']
-            links = wikidata['entities'][self.wkp]['sitelinks']
-            if "en" in labels:
-                self.name_en = labels['en']['value']
-            if "ja" in labels:
-                self.name_jp = labels['ja']['value']
-            if "P19" in claims:
-                if "datavalue" in claims['P19'][0]['mainsnak']:
-                    placeOfBirthID = claims['P19'][0]['mainsnak']['datavalue']['value']['id']
-                    placeOfBirthLabel = WikidataHelper().getLabel(placeOfBirthID, "en")
-                    self.birthplace = {'name': placeOfBirthLabel,
-                                       'wkp': placeOfBirthID}
-            if "P69" in claims:
-                for edu in claims['P69']:
-                    educatedAtID = edu['mainsnak']['datavalue']['value']['id']
-                    educatedAtLabel_en = WikidataHelper().getLabel(educatedAtID, "en")
-                    educatedAtLabel_jp = WikidataHelper().getLabel(educatedAtID, "ja")
-                    self.education.append({'name': educatedAtLabel_en,
-                                           'name_jp': educatedAtLabel_jp,
-                                           'wkp': educatedAtID})
-            if "P569" in claims:
-                if "datavalue" in claims['P569'][0]['mainsnak']:
-                    birthdate =  claims['P569'][0]['mainsnak']['datavalue']['value']['time']
-                    self.birth = birthdate[1:5]
-            if "P570" in claims:
-                if "datavalue" in claims['P570'][0]['mainsnak']:
-                    deathdate = claims['P570'][0]['mainsnak']['datavalue']['value']['time'][1:5]
-                    self.death = deathdate
-            if "P21" in claims:
-                if "datavalue" in claims['P21'][0]['mainsnak']:
-                    gender = claims['P21'][0]['mainsnak']['datavalue']['value']['id']
-                    if gender == 'Q6581097':
-                        self.sex = "m"
-                    if gender == 'Q6581072':
-                        self.sex = "f"
-                        print("!!female!!")
-            if "enwiki" in links:
-                self.wikiLink_en = "https://en.wikipedia.org/wiki/"+links['enwiki']['title']
-            if "jawiki" in links:
-                self.wikiLink_ja = "https://ja.wikipedia.org/wiki/" + links['jawiki']['title']
-
-
-    def getAuthorityIDs(self):
-        if self.viaf is not None:
-            data = getUrlDataAsString("http://viaf.org/viaf/"+self.viaf + "/justlinks.json")
-
-            if data is not None:
-                links = json.loads(data)
-                if "NDL" in links:
-                    self.ndl = links["NDL"][0]
-                    self.possibleEntries += 1
-                    print(self.ndl)
-                if "WKP" in links:
-                    self.wkp = links["WKP"][0]
-                    print(self.wkp)
-                if "NII" in links:
-                    self.nii = links["NII"][0]
-                    print(self.nii)
-
-                self.numberLinks = len(links)

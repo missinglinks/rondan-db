@@ -27,7 +27,7 @@ def getKotobankEntries(name):
         if "→" in text[0:5]:
             real_name = text.split("→")[1].replace(" ","")
         
-    print(yearsbd)
+    #print(yearsbd)
     if yearsbd is not None:
         tmp = yearsbd.replace("*","").replace("(","").replace(")","")
         tmp = tmp.split("－")

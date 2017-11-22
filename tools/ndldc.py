@@ -7,12 +7,14 @@
 from .common import getUrlAsSoup
 import time
 
+TIMEOUT = 1
+
 ARTICLE_URL = 'http://iss.ndl.go.jp/api/opensearch?dpgroupid=digitalcontents&from={year_from}-01&until={year_to}-12&title={magazine}&publisher={publisher}'
 
 
 def getIssue(permalink):
     soup = getUrlAsSoup(permalink+".rdf", parser="xml")
-    time.sleep(1)
+    time.sleep(TIMEOUT)
     toc = []
 
     try:

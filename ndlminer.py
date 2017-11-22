@@ -1,9 +1,12 @@
 from tools.ndldc import getIssues
 import couchdb
+from tools.config import COUCH_SERVER
 
-couch = couchdb.Server()
-db = couch["ndldc"]
-
+couch = couchdb.Server(COUCH_SERVER)
+try:
+    db = couch["rondan_ndldc"]
+except:
+    db = couch.create("rondan_ndldc")
 
 mags = [
     ["思想","岩波書店"],
@@ -14,6 +17,7 @@ mags = [
     ["中央公論","中央公論新社"],
     ["インパクション","インパクト"],
     ["ユリイカ","青土社"],
+    ["諸君","文芸春秋"],
     ["海","中央公論社"],
     ["創","創出版"],
     ["文学","岩波書店"],

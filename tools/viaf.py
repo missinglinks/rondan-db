@@ -16,54 +16,55 @@ def getViafMatch(name):
     viafs = []
     results = getUrlAsJson(VIAF_URL.format(name=name))
 
-
-    records = results["searchRetrieveResponse"]["records"]
-    for record in records:
-        viaf_id = record["record"]["recordData"]["viafID"]
-        birth_date = record["record"]["recordData"]["birthDate"]
-        death_date = record["record"]["recordData"]["deathDate"]
-        headings = record["record"]["recordData"]["mainHeadings"]["mainHeadingEl"]
-        names = []
-        if isinstance(headings, list):
-            for heading in headings:
-                if isinstance(heading["datafield"]["subfield"], list):
-                    names.append(heading["datafield"]["subfield"][0]["#text"])
-                else:
-                    names.append(heading["datafield"]["subfield"]["#text"])
-        else:
-            if isinstance(headings["datafield"]["subfield"], list):
-                names.append(headings["datafield"]["subfield"][0]["#text"])
-            else:
-                names.append(headings["datafield"]["subfield"]["#text"])
-        names= list(set(names))
-        best_match = 0
-        for viaf_name in names:
-            match = similar(viaf_name, name)
-            if match > best_match:
-                best_match = match
-
-        viafs.append({
-            "viaf_id": viaf_id,
-            "names": names,
-            "birth_date": birth_date,
-            "death_date": death_date,
-            "match_ratio": best_match
-        })
-
-    viafs.sort(key=lambda x:x["match_ratio"],reverse=True)
-    if len(viafs) == 1:
-        return viafs[0]
-    elif len(viafs) > 1:
-        best_match = viafs[0]
-        for viaf in viafs:
-            if viaf["match_ratio"] < best_match["match_ratio"]:
-                break
-            if len(viaf["names"]) > len(best_match["names"]):
-                best_match = viaf
-        return best_match
-    else:
+    if "records" not in results["searchRetrieveResponse"]:
         return None
+    else:
+        records = results["searchRetrieveResponse"]["records"]
+        for record in records:
+            viaf_id = record["record"]["recordData"]["viafID"]
+            birth_date = record["record"]["recordData"]["birthDate"]
+            death_date = record["record"]["recordData"]["deathDate"]
+            headings = record["record"]["recordData"]["mainHeadings"]["mainHeadingEl"]
+            names = []
+            if isinstance(headings, list):
+                for heading in headings:
+                    if isinstance(heading["datafield"]["subfield"], list):
+                        names.append(heading["datafield"]["subfield"][0]["#text"])
+                    else:
+                        names.append(heading["datafield"]["subfield"]["#text"])
+            else:
+                if isinstance(headings["datafield"]["subfield"], list):
+                    names.append(headings["datafield"]["subfield"][0]["#text"])
+                else:
+                    names.append(headings["datafield"]["subfield"]["#text"])
+            names= list(set(names))
+            best_match = 0
+            for viaf_name in names:
+                match = similar(viaf_name, name)
+                if match > best_match:
+                    best_match = match
 
+            viafs.append({
+                "viaf_id": viaf_id,
+                "names": names,
+                "birth_date": birth_date,
+                "death_date": death_date,
+                "match_ratio": best_match
+            })
+
+        viafs.sort(key=lambda x:x["match_ratio"],reverse=True)
+        if len(viafs) == 1:
+            return viafs[0]
+        elif len(viafs) > 1:
+            best_match = viafs[0]
+            for viaf in viafs:
+                if viaf["match_ratio"] < best_match["match_ratio"]:
+                    break
+                if len(viaf["names"]) > len(best_match["names"]):
+                    best_match = viaf
+            return best_match
+        else:
+            return None
 
 
 # Get ID from Viaf link list
@@ -90,5 +91,5 @@ def getAuthorityIds(viaf_id):
         if "Wikipedia" in links_list:
             links["wikipedia"] = links_list["Wikipedia"]
         else:
-            link["wikipedia"] = None
+            links["wikipedia"] = None
     return links            

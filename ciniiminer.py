@@ -1,8 +1,12 @@
 from tools.cinii import getArticles
 import couchdb
+from tools.config import COUCH_SERVER
 
-couch = couchdb.Server()
-db = couch["cinii_mags"]
+couch = couchdb.Server(COUCH_SERVER)
+try:
+    db = couch["rondan_cinii"]
+except:
+    db = couch.create("rondan_cinii")
 
 
 mags = [

@@ -6,7 +6,7 @@ from requests.exceptions import Timeout
 ENCODING = "utf-8"
 PARSER = "html.parser"
 
-TIMEOUT = 4
+TIMEOUT = 10
 
 def similar(a, b):
     seq = SequenceMatcher(a=a.replace(" ","").replace(",","").lower(),b=b.replace(" ","").replace(",","").lower())

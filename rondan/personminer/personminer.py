@@ -4,7 +4,7 @@ from .wikidata import getPersonInfos
 from .kotobank import getKotobankEntries
 
 
-def get_person_details(viaf):
+def get_person_data(viaf):
 
     #print("\t get authority ids")
     ids = getAuthorityIds(viaf["viaf_id"])

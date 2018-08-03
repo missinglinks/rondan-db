@@ -1,0 +1,1 @@
+from .personminer import get_person_data

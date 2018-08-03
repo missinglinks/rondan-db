@@ -75,7 +75,16 @@ def getViafMatch(name):
 # Get ID from Viaf link list
 def getAuthorityIds(viaf_id):
     links = {}
+    #print(viaf_id)
     links_list = getUrlAsJson(VIAF_LINKS.format(id=viaf_id))
+    #print(links_list)
+
+    if type(links_list) == int:
+        new_id = str(links_list).replace(str(viaf_id),"").strip()
+        print(new_id)
+        links_list =  getUrlAsJson(VIAF_LINKS.format(id=new_id))
+
+
     if links_list is not None:
         if "viafID" in links_list:
             links["viaf"] = links_list["viafID"]

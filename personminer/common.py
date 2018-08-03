@@ -24,10 +24,10 @@ def getUrlAsSoup(url, encoding=ENCODING, parser=PARSER):
             print(" ... retry")
             time.sleep(RETRY)
             continue
-        except SSLError:
-            print(" ... retry")
-            time.sleep(RETRY)
-            continue            
+        # except SSLError:
+        #     print(" ... retry")
+        #     time.sleep(RETRY)
+        #     continue            
     return BeautifulSoup(r.content.decode(encoding), parser)
 
 def getUrlAsJson(url):

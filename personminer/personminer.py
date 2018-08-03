@@ -11,13 +11,13 @@ def get_person_details(viaf):
     #print("\t get wiki info")
     wiki = getPersonInfos(ids["wkp"])
     #print("\t check kotobank entries")
-    kotobank = getKotobankEntries(viaf["names"][0])
+    #kotobank = getKotobankEntries(viaf["names"][0])
     person_data = {
         "id": viaf["viaf_id"],
         "viaf": viaf,
         "ids": ids,
         "wiki": wiki,
-        "kotobank": kotobank
+        #"kotobank": kotobank
     }
     return person_data
 

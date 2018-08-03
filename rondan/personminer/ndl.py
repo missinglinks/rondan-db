@@ -4,8 +4,7 @@
 # author: peter.muehleder@uni-leipzig.de
 #
 
-from .common import getUrlAsJson
-from .japanese import kanaToRomaji
+from ..utils import getUrlAsJson, kanaToRomaji
 import re
 
 PERSON_JSON = "http://id.ndl.go.jp/auth/ndlna/{id}.json"

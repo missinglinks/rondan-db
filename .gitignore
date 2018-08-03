@@ -3,3 +3,4 @@ config.py
 .vscode/
 *.pyc
 data/
+rondan.egg-info/

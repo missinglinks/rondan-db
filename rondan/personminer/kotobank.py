@@ -1,5 +1,5 @@
 
-from .common import getUrlAsSoup
+from ..utils import getUrlAsSoup
 
 KOTOBANK_JINMEI = "https://kotobank.jp/word/{name}?dic=nihonjinmei"
 

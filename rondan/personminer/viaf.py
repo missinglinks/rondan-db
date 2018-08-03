@@ -4,7 +4,7 @@
 # author: peter.muehleder@uni-leipzig.de
 #
 
-from .common import getUrlAsJson, similar
+from ..utils import getUrlAsJson, similar
 
 VIAF_URL = 'http://www.viaf.org/viaf/search?query=local.personalNames+all+"{name}"&maximumRecords=50&httpAccept=application/json&recordSchema=info:srw/schema/1/briefmarcxml-v1.1&sortKeys=holdingscount'
 VIAF_LINKS = "http://viaf.org/viaf/{id}/justlinks.json"

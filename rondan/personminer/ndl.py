@@ -4,34 +4,15 @@
 # author: peter.muehleder@uni-leipzig.de
 #
 
-from ..utils import getUrlAsJson, kanaToRomaji
+from ..utils import get_url_as_json, kana_to_romaji, cap_first_letters, remove_years
 import re
 
 PERSON_JSON = "http://id.ndl.go.jp/auth/ndlna/{id}.json"
-YEAR_REGEX = r', [0-9]{4}.*'
 
-
-def __capFirstLetters(st):
-    st = st.title()
-    # create character list
-    new_st = list(st)
-    # look up positions of ' character in string
-    positions = [m.start() for m in re.finditer("'", st)]
-    # lower the character after ' in string list
-    for position in positions:
-        if position < len(st):
-            new_st[position+1] = new_st[position+1].lower()
-    # convert list to string and return string
-    return "".join(new_st)
-
-def __removeYears(label):
-    label = re.sub(YEAR_REGEX,"",label)
-    return label
-
-def getLabel(ndl_id):
+def get_label(ndl_id):
     romaji = None
     penname = None
-    data = getUrlAsJson(PERSON_JSON.format(id=ndl_id))
+    data = get_url_as_json(PERSON_JSON.format(id=ndl_id))
 
     #check if name is real
     if "realName" in data:
@@ -42,15 +23,15 @@ def getLabel(ndl_id):
 
     label_lit = data["prefLabel"]["literalForm"]
     try:
-        transcription = __removeYears(data["prefLabel"]["transcription"])
+        transcription = remove_years(data["prefLabel"]["transcription"])
     except:
         transcription = None
     
     if transcription is not None:
-        romaji = __capFirstLetters(kanaToRomaji(transcription))
+        romaji = cap_first_letters(kana_to_romaji(transcription))
 
     label = {
-        "litearal": __removeYears(label_lit),
+        "litearal": remove_years(label_lit),
         "transcription": transcription,
         "romaji": romaji,
         "penname": penname

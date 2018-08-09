@@ -1,12 +1,5 @@
-from tools.ndldc import getIssues
-import couchdb
-from tools.config import COUCH_SERVER
+from rondan.magazines import ndldc_issues
 
-couch = couchdb.Server(COUCH_SERVER)
-try:
-    db = couch["rondan_ndldc"]
-except:
-    db = couch.create("rondan_ndldc")
 
 mags = [
     ["思想","岩波書店"],
@@ -42,20 +35,10 @@ for mag in mags:
 
 
         for year in range(1920, 2017):
-            results = getIssues(mag[0], mag[1], year, year)
+            results = ndldc_get_issues(mag[0], mag[1], year, year)
 
             #print(results)
             magazine += results
             print("\t {} - {}".format(year, len(results)))
-
-        if magazine != []:
-            db.save(
-                {
-                    "_id": mag_id,
-                    "magazine": mag[0],
-                    "publisher": mag[1],
-                    "issues": magazine
-                }
-            )
 
 #print(articles)

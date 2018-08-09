@@ -1,8 +1,4 @@
-from tools.cinii import getArticles
-import couchdb
-from tools.config import COUCH_SERVER
-
-couch = couchdb.Server(COUCH_SERVER)
+from rondan.magazines import cinii_articles
 try:
     db = couch["rondan_cinii"]
 except:
@@ -51,19 +47,3 @@ for mag in mags:
                     first = False
                 year_max = year
             articles += results
-            print("{} - {}".format(year, len(results)))
-
-
-        if articles != []:
-            db.save(
-                {
-                    "_id": mag_id,
-                    "magazine": mag[0],
-                    "publisher": mag[1],
-                    "articles": articles,
-                    "year_from": year_min,
-                    "year_to": year_max
-                }
-            )
-
-#print(articles)

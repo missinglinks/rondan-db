@@ -1,7 +1,7 @@
-from .ndl import getLabel
-from .viaf import getViafMatch, getAuthorityIds
-from .wikidata import getPersonInfos
-from .kotobank import getKotobankEntries
+from .ndl import get_label
+from .viaf import get_viaf_match, get_authority_ids
+from .wikidata import get_person_infos
+from .kotobank import get_kotobank_entries
 
 
 def get_person_data(viaf):

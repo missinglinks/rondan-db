@@ -1,9 +1,9 @@
 
-from ..utils import getUrlAsSoup
+from ..utils import get_url_as_soup
 
 KOTOBANK_JINMEI = "https://kotobank.jp/word/{name}?dic=nihonjinmei"
 
-def getKotobankEntries(name):
+def get_kotobank_entries(name):
     articles = []
     real_name = None
     year_of_birth = None
@@ -12,7 +12,7 @@ def getKotobankEntries(name):
     yearsbd = None
 
     url = KOTOBANK_JINMEI.format(name=name)
-    soup = getUrlAsSoup(url)
+    soup = get_url_as_soup(url)
     article_set = soup.findAll('article')
     for article in article_set:
         dic = article.find('h2').text

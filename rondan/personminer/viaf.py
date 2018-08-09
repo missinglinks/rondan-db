@@ -4,7 +4,7 @@
 # author: peter.muehleder@uni-leipzig.de
 #
 
-from ..utils import getUrlAsJson, similar
+from ..utils import get_url_as_json, similar
 
 VIAF_URL = 'http://www.viaf.org/viaf/search?query=local.personalNames+all+"{name}"&maximumRecords=50&httpAccept=application/json&recordSchema=info:srw/schema/1/briefmarcxml-v1.1&sortKeys=holdingscount'
 VIAF_LINKS = "http://viaf.org/viaf/{id}/justlinks.json"
@@ -12,7 +12,7 @@ VIAF_LINKS = "http://viaf.org/viaf/{id}/justlinks.json"
 
 # Search viaf.org for a Name and returns the best match (based on name similarity)
 # if more entries match with the same similarity, best match will be based on number of name entries (= number of mentions in national libraries)
-def getViafMatch(name):
+def get_viaf_match(name):
     viafs = []
     while True:
         results = getUrlAsJson(VIAF_URL.format(name=name.replace('"', "'")))
@@ -73,7 +73,7 @@ def getViafMatch(name):
 
 
 # Get ID from Viaf link list
-def getAuthorityIds(viaf_id):
+def get_authority_ids(viaf_id):
     links = {}
     #print(viaf_id)
     links_list = getUrlAsJson(VIAF_LINKS.format(id=viaf_id))

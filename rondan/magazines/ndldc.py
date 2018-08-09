@@ -4,15 +4,14 @@
 # author: peter.muehleder@uni-leipzig.de
 #
 
-from .common import getUrlAsSoup
+from ..utils import get_url_as_soup
 import time
 
 TIMEOUT = 1
-
 ARTICLE_URL = 'http://iss.ndl.go.jp/api/opensearch?dpgroupid=digitalcontents&from={year_from}-01&until={year_to}-12&title={magazine}&publisher={publisher}'
 
 
-def getIssue(permalink):
+def get_issue(permalink):
     soup = getUrlAsSoup(permalink+".rdf", parser="xml")
     time.sleep(TIMEOUT)
     toc = []
@@ -109,10 +108,10 @@ def getIssue(permalink):
 
 
 
-def getIssues(magazine, publisher, year_from, year_to):
+def ndldc_get_issues(magazine, publisher, year_from, year_to):
     issues = []
 
-    soup = getUrlAsSoup(ARTICLE_URL.format(magazine=magazine, publisher=publisher, year_from=year_from, year_to=year_to), parser="xml")
+    soup = get_url_as_soup(ARTICLE_URL.format(magazine=magazine, publisher=publisher, year_from=year_from, year_to=year_to), parser="xml")
     total_results = int(soup.find("totalResults").text)
     print("Issues found: "+repr(total_results))
 
@@ -122,7 +121,7 @@ def getIssues(magazine, publisher, year_from, year_to):
         if str(magazine) == str(title):
             permalink = item.find("link").text
             vol = item.find("volume")
-            issue = getIssue(permalink)
+            issue = get_issue(permalink)
             issues.append(issue)
        
 

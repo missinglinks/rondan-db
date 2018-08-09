@@ -1,9 +1,9 @@
-from .common import getUrlAsJson
+from ..utils import get_url_as_json
 
 ARTICLE_URL = 'http://ci.nii.ac.jp/opensearch/search?count=200&start={offset}&lang=ja&journal={magazine}&issn=&publisher={publisher}&year_from={year_from}&year_to={year_to}&format=json&appid=upmkTSWtpQK7f9LqGpTg'
 
 
-def getArticles(magazine, publisher, year_from, year_to):
+def cinii_articles(magazine, publisher, year_from, year_to):
     
     articles = []
     offset = 0

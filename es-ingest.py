@@ -6,6 +6,7 @@ from elasticsearch import helpers
 from datetime import datetime
 from gensim.models import Phrases
 from janome.tokenizer import Tokenizer
+from config imporr ES_SERVER
 
 #MODELS
 CORPUS_DIR = "data/corpus"
@@ -16,7 +17,6 @@ BIGRAM = Phrases.load(BIGRAM_MODEL)
 T = Tokenizer()
 
 #ELASTICSEARCH CONFIGURATION
-ES_SERVER = 'http://elastic:derridablablabla@37.120.165.192:9200'
 
 ARTICLE_INDEX = "ck_articles"
 ARTICLE_DOC_TYPE = "article"

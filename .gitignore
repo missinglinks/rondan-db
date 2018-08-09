@@ -4,3 +4,4 @@ config.py
 *.pyc
 data/
 rondan.egg-info/
+config.py

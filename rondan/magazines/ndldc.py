@@ -12,7 +12,7 @@ ARTICLE_URL = 'http://iss.ndl.go.jp/api/opensearch?dpgroupid=digitalcontents&fro
 
 
 def get_issue(permalink):
-    soup = getUrlAsSoup(permalink+".rdf", parser="xml")
+    soup = get_url_as_soup(permalink+".rdf", parser="xml")
     time.sleep(TIMEOUT)
     toc = []
 
@@ -108,7 +108,7 @@ def get_issue(permalink):
 
 
 
-def ndldc_get_issues(magazine, publisher, year_from, year_to):
+def ndldc_issues(magazine, publisher, year_from, year_to):
     issues = []
 
     soup = get_url_as_soup(ARTICLE_URL.format(magazine=magazine, publisher=publisher, year_from=year_from, year_to=year_to), parser="xml")
